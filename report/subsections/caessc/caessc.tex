@@ -1,4 +1,5 @@
 \subsection{CAESSC}
+%TODO: rewrite 
 The model is the following:
 \begin{figure}[H]
     \centering
@@ -8,7 +9,7 @@ The model is the following:
 In order to achieve good result for low-level image processing as deblurring, super-resolution, deep network are necessary.
 Nevertheless the deeper the network the slower the training is thus skip connections are used between symmetric convolutional and deconvolutional layers.
 
-Features are extracted by convolutional layers (encoder) and information are used by deconvolutional layer (decoder) for reconstructing the image; moreover skip connections are used for increasing performance and the ability to converge of the network.
+Features are extracted by convolutional layers (encoder) and information are used by deconvolutional layer (decoder) for reconstructing the image; moreover symmetric  skip connections are used for increasing performance and the ability to converge of the network.
 
 The architecture is quite simple:
 \begin{itemize}
@@ -27,14 +28,19 @@ Skip connections have important goals \cite{resnet}:
 \end{enumerate}
 
 The model implemented were two:
+\newcommandx{\CAESSC}[3][3={}]{CAESSC\_d{#1}\_f{#2}{#3}}
 
 \begin{itemize}
-    \item CAESSC\_d16\_f128: depth equals to 16 and filters equal to 128
-    \item CAESSC\_d32\_f64: depth equals to 32 and filters equal to 64
+    \item \CAESSC{30}{64}: depth equals to 30, filters equal to 64 and no downsampling applied.
+    \item \CAESSC{22}{128}{half}: depth equals to 22, filters equal to 128 and downsampling applied.
 \end{itemize}
 
+\subsection{Training}
+The network was trained using Adam\cite{adam} with $1e^{-4}$ as learning rate, MSE as loss function and with an early stopping equals to 7 in order to push more the training.
+
 \subsection{Results}
-CAESSC\_d16\_f128 and CAESSC\_d32\_f64 converged, respectively, after 12 and 19 epochs:
+\CAESSC{30}{64}, . converged, respectively, after . and . epochs with early stopping equals to 6.
+
 \begin{figure}[H]
     \begin{subfigure}{\textwidth}
         \centering
@@ -49,7 +55,7 @@ CAESSC\_d16\_f128 and CAESSC\_d32\_f64 converged, respectively, after 12 and 19 
 The evaluation of the networks is the following:
 
 \begin{tabularx}{300pt}{ccccc}
-    & \multicolumn{3}{c}{CAESSC} & {RED30} \footnote{RED30 is composed by 30 layers with skip connections every 2 layers, 128 filters and kernel size equal to 3. Taken from \url{https://github.com/ved27/RED-net/blob/master/model/REDNet_ch3.prototxt}} \\
+    & \multicolumn{3}{c}{CAESSC} & {RED30} \footnote{RED30 is composed by 30 layers with skip connections every 2 layers, 128 filters and kernel size equal to 3. Taken from \url{https://github.com/ved27/RED-net/blob/master/model/REDNet_ch3.prototxt and /model/debluring/gaussian.caffemodel}} \\
     network & MSE & PSNR & SSIM & PSNR  \\
     CAESSC\_d16\_f128 & 0.0019 & 28.56 & 0.91 & 34.49 \\
     CAESSC\_d32\_f64 & 0.0017 & 29.00 & 0.92 & 34.49

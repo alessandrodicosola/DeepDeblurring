@@ -10,39 +10,41 @@ class CAESSC(BaseModel):
     Convolutional Auto Encoders with Symmetric Skip Connections
     """
 
-    def __init__(self, depth, start_features, downsample):
+    def __init__(self, depth, start_features, downsample, use_sigmoid=True):
         """
+        :param depth: amount of total layers
         :param start_features: amount of filters to use
-        :param skip_connections: amount of skip connections
         :param downsample: half the size of the input
+        :param use: if True then Sigmoid is used as last activation function
         """
-        batch_size = 200 if depth == 30 and start_features == 128 else 250
-        super(CAESSC, self).__init__(f"CAESSC_d{depth}_f{start_features}{'_half' if downsample else ''}",
-                                     batch_size=batch_size, epochs=60,
-                                     early_stopping_patience=7)
+        if depth >= 30: batch_size = 250
+        if depth >= 128: batch_size = 200
+        super(CAESSC, self).__init__(
+            f"CAESSC_d{depth}_f{start_features}{'_half' if downsample else ''}{'_no_sigmoid' if not use_sigmoid else ''}",
+            batch_size=batch_size, epochs=90, early_stopping_patience=7,last_epoch=0)
         self.start_features = start_features
         self.depth = depth
         self.downsample = downsample
+        self.use_sigmoid = use_sigmoid
 
     def conv2d(self, before, features, kernel_size=(3, 3), strides=1, name=None):
         out = Conv2D(features, kernel_size, strides=strides, padding="same", use_bias=False, name=f"{name}_conv")(
             before)
         out = BatchNormalization(name=f"{name}_bn")(out)
-        out = LeakyReLU(name=f"{name}_lrelu")(out)
+        out = Activation("relu", name=f"{name}_relu")(out)
         return out
 
-    def conv2d_transpose(self, before, features, kernel_size=(3, 3), strides=1, name=None, use_sigmoid=False):
+    def conv2d_transpose(self, before, features, kernel_size=(3, 3), strides=1, name=None):
         out = Conv2DTranspose(features, kernel_size, strides=strides, padding="same", use_bias=False,
                               name=f"{name}_deconv")(before)
         out = BatchNormalization(name=f"{name}_bn")(out)
-        out = LeakyReLU(name=f"{name}_lrelu")(out) if not use_sigmoid else Activation("sigmoid",
-                                                                                      name=f"{name}_sigmoid")(out)
+        out = Activation("relu", name=f"{name}_relu")(out)
         return out
 
-    def sum(self, layers):
+    def sum(self, layers, use_sigmoid=False):
         out = add(layers)
         out = BatchNormalization()(out)
-        out = LeakyReLU()(out)
+        out = Activation("relu" if not use_sigmoid else "sigmoid")(out)
         return out
 
     def _set_model(self):
@@ -68,21 +70,18 @@ class CAESSC(BaseModel):
                 res_layers.append(layer)
 
         for i in reversed(range(1, n + 1)):
-            # transform i from 0-n-1 to 1-n
             if i != n and i != 1 and i % interval == 0:
+                layer = self.conv2d_transpose(layer, features, kernel_size=kernel_size, name=f"decoder_{i}")
                 selected_layer = res_layers.pop(-1)
                 layer = self.sum([selected_layer, layer])
-
-            if i == 2 and self.downsample:
-                # avoid chessboard effect with (4,4)
-                layer = self.conv2d_transpose(layer, features, kernel_size=(4, 4), strides=2, name="up")
             elif i == 1:
                 # Transform to 3 channels
-                layer = self.conv2d_transpose(layer, 3, kernel_size=kernel_size, strides=1, name="output", use_sigmoid=True)
+                layer = self.conv2d_transpose(layer, 3, kernel_size=kernel_size, strides=2 if self.downsample else 1,
+                                              name="output")
             else:
                 layer = self.conv2d_transpose(layer, features, kernel_size=kernel_size, name=f"decoder_{i}")
 
-        output = add([input_layer, layer])
+        output = self.sum([input_layer, layer], use_sigmoid=self.use_sigmoid)
 
         self._model = Model(input_layer, output)
 
@@ -98,5 +97,5 @@ class CAESSC(BaseModel):
         from src.basemodel.metrics import metrics
 
         if self._model is None: self._set_model()
-        compile_args = {"optimizer": Adam(), "loss": "mse", "metrics": metrics}
+        compile_args = {"optimizer": Adam(learning_rate=1e-4), "loss": "mse", "metrics": metrics}
         self._model.compile(**compile_args)

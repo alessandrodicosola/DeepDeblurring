@@ -12,7 +12,7 @@ Descending and ascending paths are connected togheter at each level in order to 
 
 This pattern can be also used for image-to-image processing although some changes are necessary:
 \begin{itemize}
-    \item With respect to the original paper the downsampling and upsampling is done respectively using \textcolor{red}{\textit{Conv2D}} and \textcolor{yellow}{\textit{Conv2DTranspose}} in order to "learn" the transformation instead of using MaxPooling and UpSampling leading to a loss of information.
+    \item With respect to the original paper the downsampling and upsampling is done respectively using \textit{Conv2D}(red) and \textit{Conv2DTranspose}(yellow) in order to "learn" the transformation instead of using MaxPooling and UpSampling leading to a loss of information.
     \item Moreover the \textit{ResBlock} ( as defined in \cite{resnet} ) is used in order to increment the amount of information propagated at each level in both paths. \footnote{In the CAESSC network will be discussed the advantages of the residual connections}
 \end{itemize}
 
@@ -27,12 +27,10 @@ The \textit{ResBlock} is composed by two Conv2D layers and the output is the con
 
 The networks implemented are: \textbf{ResUNet1} with 1 ResBlock and \textbf{ResUNet3} with 3 ResBlock.
 
-
-\subsection{Results}
-
+\subsection{Training}
+The network was trained with Adam\cite{adam} with default parameters using an early stopping equals to 7 for avoiding overfitting and MSE as loss function.
 SRNDeblur1 and SRNDeblur3 converged, respectively, after 40 and 50 epochs.
-
-\begin{figure}
+\begin{figure}[H]
     \begin{subfigure}{\textwidth}
         \centering
         \includegraphics[height=0.4\textheight,keepaspectratio]{subsections/resunet/plot_history_ResUNet1.pdf}            
@@ -41,16 +39,20 @@ SRNDeblur1 and SRNDeblur3 converged, respectively, after 40 and 50 epochs.
         \centering
         \includegraphics[height=0.4\textheight,keepaspectratio]{subsections/resunet/plot_history_ResUNet3.pdf}            
     \end{subfigure}
+    \caption{Training information of ResUNet}
 \end{figure}
-
+ 
+\subsection{Results}
 Two models were tested and the evaluation on a \textbf{uniform gaussian blur} is the following:
-
-\begin{tabularx}{300pt}{cccc}
-    \centering
-    number of ResBlock & MSE & PSNR & SSIM \\
-    1 & 0.0018 & 28.49 & 0.930 \\
-    3 & 0.0016 & 29.03 & 0.935
-\end{tabularx}
+\begin{center}
+    \small
+    \begin{tabularx}{300pt}{cccc}
+        \centering
+        number of ResBlock & MSE & PSNR & SSIM \\
+        1 & 0.0018 & 28.49 & 0.930 \\
+        3 & 0.0016 & 29.03 & 0.935
+    \end{tabularx}    
+\end{center}
 
 \begin{figure}[H]
     \centering

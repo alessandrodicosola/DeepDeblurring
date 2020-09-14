@@ -127,7 +127,8 @@
             \end{column}
             \begin{column}[c]{.30\paperwidth}
                 \begin{itemize}
-                    \item Encoder-Decoder architecture
+                    \item Encoder: [6,6,3]
+                    \item Decoder: [3,6]
                     \item Use of DenseBlock
                     \item $\textnormal{Conv} \rightarrow BN \rightarrow ReLU$
                     \item Conv2DTranspose at the end
@@ -181,25 +182,7 @@
     \only<2>{
         \begin{columns}
             \begin{column}[c]{0.30\paperwidth}
-                \begin{figure}
-                    \centering
-                    \includegraphics[width=0.30\paperwidth,keepaspectratio]{caessc/d16_f128.pdf}
-                    \caption{CAESSC with depth=16 and filters=128}
-                \end{figure}
-            \end{column}
-            \begin{column}[c]{0.30\paperwidth}
-                \begin{figure}
-                    \centering
-                    \includegraphics[width=0.30\paperwidth,keepaspectratio]{caessc/d16_f128.pdf}
-                    \caption{CAESSC with depth=16 and filters=128}
-                \end{figure}
-            \end{column}
-            \begin{column}[c]{0.30\paperwidth}
-                \begin{figure}
-                    \centering
-                    \includegraphics[width=0.30\paperwidth,keepaspectratio]{caessc/d16_f128.pdf}
-                    \caption{CAESSC with depth=16 and filters=128}
-                \end{figure}
+               
             \end{column}
         \end{columns}
     }
@@ -296,6 +279,7 @@
 
 
 \begin{frame}{Bibliography}
+    \small
     \bibliographystyle{ieeetr}
     \bibliography{Report}
 \end{frame}

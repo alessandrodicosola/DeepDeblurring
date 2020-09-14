@@ -20,25 +20,28 @@ The model implemented has different characteristics:
     \item With respect to the original paper the downsampling and upsampling is done respectively using Conv2D and Conv2DTranspose in order to "learn" the transformation instead of using MaxPooling and UpSampling leading to a loss of information.
     \item Last layer is a Conv2DTranspose layer which "learn" to decode the output.
 \end{itemize}
-
-\subsection{Results}
-The network converged after 22 epochs.
+\subsection{Training}
+The network was trained with Adam\cite{adam} with default parameters using an early stopping equals to 5 for avoiding overfitting and MSE as loss function.
+The network converged after 22 epochs with early stopping equals to 5.
 \begin{figure}[H]
     \centering
     \includegraphics[height=0.4\textheight,keepaspectratio]{subsections/densenet/plot_history_EDDenseNet.pdf}
     \caption{Training information of EDDenseNet.}
 \end{figure}        
 
+\subsection{Results}
 The evaluation of the network is the following:
+\begin{center}
+    \small
+    \begin{tabularx}{165pt}{c|ccc}
+        \centering
+        kernel type & MSE & PSNR & SSIM \\
+        \hline
+        gaussian & 0.0021 & 27.62 & 0.90
+    \end{tabularx}        
+\end{center}
 
-\begin{tabularx}{165pt}{c|ccc}
-    \centering
-    kernel type & MSE & PSNR & SSIM \\
-    \hline
-    gaussian & 0.0021 & 27.62 & 0.90
-\end{tabularx}
-
-My implementation (the encoder) is not so deep as the one implemented by researchers, nevertheless the result are quite good.
+My implementation (the encoder) is not so deep as the one implemented by researchers, nevertheless the results are quite good.
 
 \begin{figure}[H]
     \centering

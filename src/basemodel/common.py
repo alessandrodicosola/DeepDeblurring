@@ -34,15 +34,19 @@ def plot_csv(path, what, title=None, best_epoch=None):
     import numpy as np
     import pandas as pd
     import matplotlib.pyplot as plt
+    import seaborn as sbn
+    sbn.set(style="white", palette="pastel",)
     from pathlib import Path
     path = Path(path)
     folder = path.parent
     file_to_save = folder / f"plot_history_{title}.pdf"
 
-    df = pd.read_csv(path)
+    df = pd.read_csv(path, index_col="epoch")
+    df.index = df.index + 1
+
+    # shift range epoch column
     if best_epoch is None and "loss" in what:
-        best_epoch_index = df[f"val_loss"].idxmin()
-        best_epoch = best_epoch_index + 1
+        best_epoch = df[f"val_loss"].idxmin()
 
     n_row = len(what)
 
@@ -50,13 +54,13 @@ def plot_csv(path, what, title=None, best_epoch=None):
 
     for index in range(n_row):
         what_to_plot = [what[index], f"val_{what[index]}"]
-        df[what_to_plot].plot.line(ax=axes[index])
+        df.plot.line(y=what_to_plot, ax=axes[index], use_index=True)
 
         # best value taken from val_
         best_value = df.loc[best_epoch, what_to_plot[index]]
         # show the best value with lines
         # plot horizontal line
-        x = list(range(0, best_epoch))
+        x = list(range(1, best_epoch))
         y = [best_value] * len(x)
         axes[index].plot(x, y, '--r')
         # plot vertical
@@ -64,9 +68,22 @@ def plot_csv(path, what, title=None, best_epoch=None):
         x = [best_epoch] * len(y)
         axes[index].plot(x, y, '--r')
         # add xtick of best epoch
-        if index == 0: axes[index].set_xticks(np.append(axes[index].get_xticks(), best_epoch))
+        if index == 0:
+            xticks = [x for x in axes[index].get_xticks()]
+
+            # remove two nearest number from x-axis
+            for k in range(1, 3):
+                if best_epoch + k in xticks:
+                    xticks.remove(best_epoch + k)
+                if best_epoch - k in xticks:
+                    xticks.remove(best_epoch - k)
+            if best_epoch not in xticks:
+                xticks.append(best_epoch)
+
+            axes[index].set_xticks(xticks)
         # add ytick of best value
         axes[index].set_yticks(np.append([tick for tick in axes[index].get_yticks() if tick > 0], best_value))
 
     plt.suptitle(title)
     plt.savefig(file_to_save, bbox_inches="tight")
+    print(f"Plot saved at: {file_to_save}")

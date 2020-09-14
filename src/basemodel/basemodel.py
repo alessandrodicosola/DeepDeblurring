@@ -128,8 +128,10 @@ class BaseModel(ABC):
 
         if self.model_dir.exists() and self.model_file.exists():
             self.set_custom_objects()
-            self._model = load_model(self.model_file, custom_objects=self.custom_objects, compile=True)
-            print("Previous model loaded.")
+            # compile False in order to change
+            self._model = load_model(self.model_file, custom_objects=self.custom_objects, compile=False)
+            self.compile()
+            print(f"Loaded model: {self.name}.")
 
         self.callbacks = self.set_callbacks()
 
