@@ -1,7 +1,7 @@
 papers
 data
 transfer.bat
-
+!models/*/*_best.h5
 *.h5
 
 
