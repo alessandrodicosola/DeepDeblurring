@@ -1,9 +1,9 @@
 from keras.backend import int_shape
+from keras.constraints import max_norm
 from keras.layers import Input, Conv2D, Conv2DTranspose, Activation, add, BatchNormalization, UpSampling2D, LeakyReLU, \
     Reshape, LSTM, Dense
-
 from keras.models import Model
-from keras.constraints import max_norm
+
 from basemodel.basemodel import BaseModel
 
 
