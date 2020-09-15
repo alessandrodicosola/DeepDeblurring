@@ -1,8 +1,9 @@
 papers
 data
 transfer.bat
-!models/*/*_best.h5
+
 *.h5
+!models/*/*_best.h5
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/pycharm,visualstudiocode,python,latex
