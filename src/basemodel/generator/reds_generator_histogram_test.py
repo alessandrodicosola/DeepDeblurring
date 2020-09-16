@@ -1,11 +1,11 @@
-import random
-from pathlib import Path
 import multiprocessing
+import random
 from multiprocessing import Pool, Value
+from pathlib import Path
 
 
 def get_dirs(subset, quality, low_res=True) -> Path:
-    from src.util import get_reds_dir
+    from util import get_reds_dir
     """
     :param low_res:
     :param subset: train,val,test
@@ -153,7 +153,6 @@ def plot_kde(list_df, titles, iterations=5):
     import numpy as np
     import matplotlib.pyplot as plt
     import matplotlib.patches as mpatches
-    import matplotlib.colors as mcolors
     from scipy.stats import gaussian_kde
 
     kd_list = list()
@@ -189,7 +188,7 @@ def plot_kde(list_df, titles, iterations=5):
         handles.append(patch2)
 
         axes[index].legend(handles=handles, loc='upper center')
-
+    plt.xlabel('ssim')
     plt.savefig(f'kde.pdf')
     plt.close()
 

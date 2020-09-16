@@ -1,6 +1,5 @@
-from keras.layers import Input, Conv2D, Conv2DTranspose, Activation, add, BatchNormalization, LeakyReLU
+from keras.layers import Input, Conv2D, Conv2DTranspose, Activation, add, BatchNormalization
 from keras.models import Model
-from keras.regularizers import l2
 
 from basemodel.basemodel import BaseModel
 
@@ -17,11 +16,15 @@ class CAESSC(BaseModel):
         :param downsample: half the size of the input
         :param use: if True then Sigmoid is used as last activation function
         """
+        batch_size = 300
         if depth >= 30: batch_size = 250
         if depth >= 128: batch_size = 200
+        #fixed batch size set for test()
+        batch_size = 250
         super(CAESSC, self).__init__(
             f"CAESSC_d{depth}_f{start_features}{'_half' if downsample else ''}{'_no_sigmoid' if not use_sigmoid else ''}",
-            batch_size=batch_size, epochs=90, early_stopping_patience=7,last_epoch=0)
+            batch_size=batch_size, epochs=80, early_stopping_patience=7,last_epoch=0)
+
         self.start_features = start_features
         self.depth = depth
         self.downsample = downsample
@@ -86,15 +89,14 @@ class CAESSC(BaseModel):
         self._model = Model(input_layer, output)
 
     def _data(self):
-        from src.basemodel.generator.cifar10_generator import cifar10_generators
+        from basemodel.generator.cifar10_generator import cifar10_generators
         (train_gen, val_gen) = cifar10_generators('train', batch_size=self.batch_size)
         test_gen = cifar10_generators('test', batch_size=self.batch_size)
-
         return (train_gen, val_gen, test_gen)
 
     def compile(self):
         from keras.optimizers import Adam
-        from src.basemodel.metrics import metrics
+        from basemodel.metrics import metrics
 
         if self._model is None: self._set_model()
         compile_args = {"optimizer": Adam(learning_rate=1e-4), "loss": "mse", "metrics": metrics}

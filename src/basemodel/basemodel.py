@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 from keras.callbacks import ModelCheckpoint, EarlyStopping, CSVLogger, Callback
 from keras.models import load_model, save_model
 
-from src.basemodel.metrics import metrics_dict
-from src.util import get_models_dir
+from util import get_models_dir
+from .metrics import metrics_dict
 
 
 class SaveModelOnInterval(Callback):
@@ -196,7 +196,7 @@ class BaseModel(ABC):
         Train the model.
         """
         if self._model is None:
-            self._set_model()
+            raise ValueError("model is None.")
 
         self.compile()
 
@@ -217,7 +217,7 @@ class BaseModel(ABC):
         Evaluate the model.
         """
         if self._model is None:
-            raise ValueError("self._model is None. Error loading model or you have to train the network")
+            raise ValueError("model is None.")
 
         (_, _, test_gen) = self._data()
         results = self._model.evaluate_generator(test_gen, self.batch_size)
@@ -235,8 +235,16 @@ class BaseModel(ABC):
             raise ValueError("model is None.")
 
         (_, _, test_gen) = self._data()
+
         batch_index = randint(0, test_gen.__len__())
-        batch_index = 12345 % test_gen.__len__()
+        start_offset = 0
+        ####
+        # Fix batch batch_indxe and start_offset for getting same images
+        # seed = 123456
+        # batch_index = seed % test_gen.__len__()
+        # start_offset = seed % self.batch_size
+        ####
+
         X_input, Y_true = test_gen.__getitem__(batch_index)
 
         Y_pred = self._model.predict(X_input, batch_size=self.batch_size)
@@ -244,11 +252,11 @@ class BaseModel(ABC):
         n = 3
         fig, axes = plt.subplots(n, 3, sharex='col')
         for i in range(n):
-            axes[i][0].imshow(X_input[i])
+            axes[i][0].imshow(X_input[start_offset + i])
             axes[i][0].set_title("Input")
-            axes[i][1].imshow(Y_pred[i])
+            axes[i][1].imshow(Y_pred[start_offset + i])
             axes[i][1].set_title("Predicted image")
-            axes[i][2].imshow(Y_true[i])
+            axes[i][2].imshow(Y_true[start_offset + i])
             axes[i][2].set_title("True image")
         path = self.model_dir / "test.pdf"
         plt.savefig(path, bbox_inches="tight")
@@ -268,3 +276,7 @@ class BaseModel(ABC):
 
     def __str__(self):
         return self.name
+
+    def open_test(self):
+        import subprocess
+        subprocess.run(["explorer", str(self.model_dir / "test.pdf")])

@@ -1,0 +1,16 @@
+\usepackage{xifthen}
+\usepackage{xargs}
+
+% used only in powerpoint.tex
+\newcommand{\reportcommanddir}{./commands}
+\newcommand{\reportcommand}[1]{\reportcommanddir/#1.bat}
+% \runtestmodel{name_file_bat}{label_to_use_in_pdf}
+\newcommand{\runtestmodel}[2]{\href{run:\reportcommand{#1}}\beamerbutton{Run test for #2}}
+% ======================================================================
+
+\newcommand{\resunet}[1]{ResUNet#1}
+\newcommandx{\CAESSC}[3][3={}]{CAESSC\_d{#1}\_f{#2}{#3}}
+\newcommand{\eddensenet}{EDDenseNet}
+\newcommand{\srndeblur}[1]{SRNDeblur\_{#1}}
+\newcommand{\srncifar}{\srndeblur{cifar}}
+\newcommand{\srnreds}{\srndeblur{reds}}

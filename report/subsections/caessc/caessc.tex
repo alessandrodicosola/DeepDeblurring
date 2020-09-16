@@ -9,12 +9,14 @@ The model is the following:
 In order to achieve good result for low-level image processing as deblurring, super-resolution, deep network are necessary.
 Nevertheless the deeper the network the slower the training is thus skip connections are used between symmetric convolutional and deconvolutional layers.
 
-Features are extracted by convolutional layers (encoder) and information are used by deconvolutional layer (decoder) for reconstructing the image; moreover symmetric  skip connections are used for increasing performance and the ability to converge of the network.
+Features are extracted by convolutional layers (encoder) and those information are used by deconvolutional layer (decoder) for reconstructing the image; moreover symmetric  skip connections are used for increasing performance and the ability to converge of the network.
 
 The architecture is quite simple:
 \begin{itemize}
-    \item The downsampling is done by a \textit{Conv2D} layer at the beginning.
-    The researchers observed that an earlier downsampling allow to decrease the testing time with a small reduction of the performance.
+    \item Convolutional and deconvolutional layer are defined as the following: $\textnormal{Conv/Deconv} \rightarrow \textnormal{BN} \rightarrow \textnormal{ReLU}$
+    \item The last layer use sigmoid\footnote{See \ref{caessctraining:training} Training} instead of ReLU (as defined in the paper)
+    \item The downsampling/upsampling are done by a the first Conv2D and last Conv2DTranspose.
+    The researchers observed that an earlier downsampling allow to decrease the training time with a small reduction of the performance.
     \item Encoder-Decoder architecture where convolutional and deconvolutional layers are connected symmetrically
     \item A skip connection between the input and the output allow to learn the output deblurred without the skip connection plus all the details learned by the encoder. \footnote{Refer to \cite[4.1 Analysis of the architecture]{CAESSC}} 
 \end{itemize}
@@ -27,54 +29,68 @@ Skip connections have important goals \cite{resnet}:
     \item Overcame \textbf{exploding gradient}: the backpropagation of the gradient could lead to an exponentially increase of the gradient the deeper the network is.
 \end{enumerate}
 
-The model implemented were two:
-\newcommandx{\CAESSC}[3][3={}]{CAESSC\_d{#1}\_f{#2}{#3}}
+
+The model implemented are: 
 
 \begin{itemize}
-    \item \CAESSC{30}{64}: depth equals to 30, filters equal to 64 and no downsampling applied.
-    \item \CAESSC{22}{128}{half}: depth equals to 22, filters equal to 128 and downsampling applied.
+    \item \textbf{\CAESSC{30}{64}}: depth equals to 30, filters equal to 64 and no downsampling applied.
+    \item \textbf{\CAESSC{22}{128}{\_half}}: depth equals to 22, filters equal to 128 and downsampling applied.\item \textbf{\CAESSC{22}{128}{\_half\_no\_sigmoid}}: depth equals to 22, filters equal to 128, downsampling applied and last layer use ReLU.
 \end{itemize}
 
-\subsection{Training}
+\subsection{Training}\label{caessctraining:training}
 The network was trained using Adam\cite{adam} with $1e^{-4}$ as learning rate, MSE as loss function and with an early stopping equals to 7 in order to push more the training.
 
-\subsection{Results}
-\CAESSC{30}{64}, . converged, respectively, after . and . epochs with early stopping equals to 6.
+Using the configuration above was observed that the performance were poor with ReLU as last activation function: we can see that the network has learned poorly the "black-scale".
 
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=200pt,keepaspectratio]{subsections/caessc/plot_history_CAESSC_d22_f128_half_no_sigmoid.pdf}
+        \caption{Training information.}        
+    \end{subfigure}
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[height=0.4\textheight,keepaspectratio]{subsections/caessc/test_CAESSC_d22_f128_half_no_sigmoid.pdf}
+        \caption{Test image.}
+    \end{subfigure}
+    \caption{CAESSC with depth=22,filters=128, downsampling and ReLU as last activation function}
+\end{figure}
+
+\CAESSC{22}{128}{\_half} and \CAESSC{30}{64} converged, respectively, within 80 and 40 epochs:
 \begin{figure}[H]
     \begin{subfigure}{\textwidth}
         \centering
-        \includegraphics[height=0.37\textheight,keepaspectratio]{subsections/caessc/plot_history_CAESSC_d16_f128.pdf}
+        \includegraphics[scale=0.5]{subsections/caessc/plot_history_CAESSC_d22_f128_half.pdf}        
     \end{subfigure}
     \begin{subfigure}{\textwidth}
         \centering
-        \includegraphics[height=0.37\textheight,keepaspectratio]{subsections/caessc/plot_history_CAESSC_d36_f64.pdf}
+        \includegraphics[scale=0.5]{subsections/caessc/plot_history_CAESSC_d30_f64.pdf}        
     \end{subfigure}
-\end{figure} 
+\end{figure}
+
+\subsection{Results}
 
 The evaluation of the networks is the following:
 
 \begin{tabularx}{300pt}{ccccc}
-    & \multicolumn{3}{c}{CAESSC} & {RED30} \footnote{RED30 is composed by 30 layers with skip connections every 2 layers, 128 filters and kernel size equal to 3. Taken from \url{https://github.com/ved27/RED-net/blob/master/model/REDNet_ch3.prototxt and /model/debluring/gaussian.caffemodel}} \\
-    network & MSE & PSNR & SSIM & PSNR  \\
-    CAESSC\_d16\_f128 & 0.0019 & 28.56 & 0.91 & 34.49 \\
-    CAESSC\_d32\_f64 & 0.0017 & 29.00 & 0.92 & 34.49
+    network & MSE & PSNR & SSIM  \\
+    RED30\footnote{RED30 is composed by 30 layers with skip connections every 2 layers, 128 filters, kernel size equal to 3 and no downsampling. Taken from \url{https://github.com/ved27/RED-net/blob/master/model/REDNet_ch3.prototxt} and \url{/model/debluring/gaussian.caffemodel}} & - & 34.49 \\
+    \CAESSC{22}{128}{\_half\_no\_sigmoid} & 0.00389 & 24.85 & 0.839 \\
+    \CAESSC{22}{128}{\_half} & 0.0020 & 28.12 & 0.916 \\
+    \CAESSC{30}{64} & 0.0018 & 28.95 & 0.919
 \end{tabularx}
-
 
 \begin{figure}[H]
     \centering
     \begin{subfigure}{\textwidth}
         \centering
-        \includegraphics[height=0.35\textheight,keepaspectratio]{subsections/caessc/d16_f128.pdf}
-        \caption{Network CAESSC\_d16\_f128}    
+        \includegraphics[height=0.47\textheight,keepaspectratio]{subsections/caessc/test_CAESSC_d22_f128_half.pdf}
+        \caption{Network \CAESSC{22}{128}{\_half}}    
     \end{subfigure}
     \begin{subfigure}{\textwidth}
         \centering
-        \includegraphics[height=0.35\textheight,keepaspectratio]{subsections/caessc/d36_f64.pdf}
-        \caption{Network CAESSC\_d32\_f64}            
+        \includegraphics[height=0.47\textheight,keepaspectratio]{subsections/caessc/test_CAESSC_d30_f64.pdf}
+        \caption{Network \CAESSC{30}{64}}            
     \end{subfigure}
-    
     \caption{Test image generated by CAESSC.}
 \end{figure}
 

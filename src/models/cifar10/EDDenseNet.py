@@ -3,7 +3,7 @@ from keras.layers import Conv2D
 from keras.layers import Input, Activation, Concatenate, BatchNormalization, Conv2DTranspose
 from keras.models import Model
 
-from src.basemodel.basemodel import BaseModel
+from basemodel.basemodel import BaseModel
 
 
 class EDDenseNet(BaseModel):
@@ -80,7 +80,7 @@ class EDDenseNet(BaseModel):
         self._model = Model(input_layer, output_layer(x))
 
     def _data(self):
-        from src.basemodel.generator.cifar10_generator import cifar10_generators
+        from basemodel.generator.cifar10_generator import cifar10_generators
         (train_gen, val_gen) = cifar10_generators('train', batch_size=self.batch_size)
         test_gen = cifar10_generators('test', batch_size=self.batch_size)
 
@@ -88,7 +88,7 @@ class EDDenseNet(BaseModel):
 
     def compile(self):
         from keras.optimizers import Adam
-        from src.basemodel.metrics import metrics
+        from basemodel.metrics import metrics
 
         if self._model is None:
             self._set_model()

@@ -7,9 +7,9 @@ from keras.models import Model
 from basemodel.basemodel import BaseModel
 
 
-class SRDeblur(BaseModel):
+class SRNDeblur(BaseModel):
     def __init__(self, use_lstm=True):
-        super(SRDeblur, self).__init__(f"SRDeblur_cifar_{'lstm' if use_lstm else 'no_lstm'}",
+        super(SRNDeblur, self).__init__(f"SRDeblur_cifar_{'lstm' if use_lstm else 'no_lstm'}",
                                        batch_size=150,
                                        epochs=70,
                                        early_stopping_patience=15,
@@ -35,8 +35,6 @@ class SRDeblur(BaseModel):
         return layer
 
     def ResBlock(self, before, features, kernel_size=(3, 3), strides=1):
-        # Different from the paper scale recurrent network for deep image deblurring  which use
-        # Nah_Deep_Multi-Scale_Convolutional_CVPR_2017_paper which doesn't use BatchNorm
         conv1 = self.conv2d(before, features, kernel_size, strides)
         conv2 = self.conv2d(conv1, features, kernel_size, strides)
         add1 = add([before, conv2])
@@ -76,9 +74,6 @@ class SRDeblur(BaseModel):
         res = self.ResBlock(add1, features, kernel_size, strides)
         res = self.ResBlock(res, features, kernel_size, strides)
         res = self.ResBlock(res, features, kernel_size, strides)
-        # layer for the output image
-        shape = int_shape(res)
-        w, h = (shape[1], shape[2])
         conv = self.deconv2d(res, output_channel, (1, 1), 1, name_output=name_output)
         return conv
 
@@ -143,12 +138,12 @@ class SRDeblur(BaseModel):
         return K.mean(K.square(y_true - y_pred), axis=[1, 2, 3])  # axis=None mean over all axis
 
     def set_custom_objects(self):
-        super(SRDeblur, self).set_custom_objects()
+        super(SRNDeblur, self).set_custom_objects()
         self.custom_objects.update({"mse_all_axis": self.mse_all_axis})
 
     def compile(self):
         from keras.optimizers import Adam
-        from src.basemodel.metrics import metrics
+        from basemodel.metrics import metrics
         # Keras will make a mean of the sum of the two euclidean distance
         if self._model is None: self._set_model()
         compile_args = {"optimizer": Adam(), "loss": [self.mse_all_axis, self.mse_all_axis], "loss_weights": [1, 1],
@@ -156,7 +151,7 @@ class SRDeblur(BaseModel):
         self._model.compile(**compile_args)
 
     def _data(self):
-        from src.basemodel.generator.cifar10_generator import cifar10_generator_two_inputs
+        from basemodel.generator.cifar10_generator import cifar10_generator_two_inputs
         from keras.datasets import cifar10
         from sklearn.model_selection import train_test_split
 
@@ -179,7 +174,6 @@ class SRDeblur(BaseModel):
         from random import randint
         (_, _, test_gen) = self._data()
         batch_index = randint(0, test_gen.__len__())
-        batch_index = 30
 
         [batch_res_blur, batch_blur], [batch_res, batch] = test_gen.__getitem__(batch_index)
         [y1, y2] = self._model.predict([batch_res_blur, batch_blur])

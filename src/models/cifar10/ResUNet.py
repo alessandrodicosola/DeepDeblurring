@@ -6,7 +6,7 @@ from keras.layers import Input
 from keras.layers import concatenate, Conv2DTranspose, add
 from keras.models import Model
 
-from src.basemodel.basemodel import BaseModel
+from basemodel.basemodel import BaseModel
 
 
 class ResUNet(BaseModel):
@@ -58,19 +58,19 @@ class ResUNet(BaseModel):
         features = 32
 
         desc1 = self.Conv2D(input, features, kernel_size)
-        desc1 = self.UnitBlock(self.n_resblock,desc1, kernel_size)
+        desc1 = self.UnitBlock(self.n_resblock, desc1, kernel_size)
 
         desc2 = self.Conv2D(desc1, features * 2, kernel_size, strides=2)
-        desc2 = self.UnitBlock(self.n_resblock,desc2, kernel_size)
+        desc2 = self.UnitBlock(self.n_resblock, desc2, kernel_size)
 
         desc3 = self.Conv2D(desc2, features * 4, kernel_size, strides=2)
-        desc3 = self.UnitBlock(self.n_resblock,desc3, kernel_size)
+        desc3 = self.UnitBlock(self.n_resblock, desc3, kernel_size)
 
         asc2 = self.ConcatBlock(desc2, desc3, kernel_size)
-        asc2 = self.UnitBlock(self.n_resblock,asc2, kernel_size, descending=True)
+        asc2 = self.UnitBlock(self.n_resblock, asc2, kernel_size, descending=True)
 
         asc1 = self.ConcatBlock(desc1, asc2, kernel_size)
-        asc1 = self.UnitBlock(self.n_resblock,asc1, kernel_size, descending=True)
+        asc1 = self.UnitBlock(self.n_resblock, asc1, kernel_size, descending=True)
 
         output = Conv2DTranspose(features, kernel_size, activation="relu", padding="same")(asc1)
         output = Conv2DTranspose(3, kernel_size, activation="sigmoid", padding="same")(output)
@@ -80,7 +80,7 @@ class ResUNet(BaseModel):
         self._model = model
 
     def _data(self):
-        from src.basemodel.generator.cifar10_generator import cifar10_generators
+        from basemodel.generator.cifar10_generator import cifar10_generators
         (train_gen, val_gen) = cifar10_generators('train', batch_size=self.batch_size)
         test_gen = cifar10_generators('test')
 
@@ -88,7 +88,7 @@ class ResUNet(BaseModel):
 
     def compile(self):
         from keras.optimizers import Adam
-        from src.basemodel.metrics import metrics
+        from basemodel.metrics import metrics
 
         if self._model is None: self._set_model()
         compile_args = {"optimizer": Adam(), "loss": "mse", "metrics": metrics}

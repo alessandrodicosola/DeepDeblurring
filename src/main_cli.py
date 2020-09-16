@@ -21,8 +21,8 @@ available_arguments = {
                ["--use_relu",
                 {"help": "Use ReLU as last activation function",
                  "action": "store_true"}]],
-    "SRNDeblur_cifar": [{"dest": "use_lstm", "action": "store_true"}],
-    "SRNDeblur_reds": [{"dest": "low_res_test", "action": "store_true"}]
+    "SRNDeblur_cifar": [["--use_lstm", {"action": "store_true"}]],
+    "SRNDeblur_reds": [["--low_res_test", {"action": "store_true"}]]
 }
 
 name = "Deep Deblurring"
@@ -34,22 +34,22 @@ for model in available_arguments:
     parser = subargs.add_parser(model,
                                 description="Available configuration: << CAESSC 22 128 --downsample>> << CAESSC 30 64 >>, << CAESSC 22 128 --downsample --use_relu >>" if model == "CAESSC" else None)
     for arg in available_arguments[model]:
-        if isinstance(arg,list):
+        if isinstance(arg, list):
             # arg[0]: positional arguments
             # arg[1]: named arguments
             parser.add_argument(arg[0], **(arg[1]))
-        elif isinstance(arg,dict):
+        elif isinstance(arg, dict):
             # only named arguments
             parser.add_argument(**arg)
         else:
-            raise RuntimeError("Invalid data structure")
+            raise RuntimeError(f"{type(arg)} data structure")
 
 result = args.parse_args()
 
 model = None
 if result.model == "ResUNet":
     model = ResUNet(result.resblocks)
-elif result.model == "EDdenseNet":
+elif result.model == "EDDenseNet":
     model = EDDenseNet()
 elif result.model == "CAESSC":
     model = CAESSC(result.depth, result.filters, result.downsample, not result.use_relu)

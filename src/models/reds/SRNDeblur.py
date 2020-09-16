@@ -1,11 +1,10 @@
-from keras.backend import int_shape
-
-from keras.layers import Input, Conv2D, Conv2DTranspose, Activation, add, BatchNormalization, UpSampling2D, LeakyReLU, \
-    LSTM, ConvLSTM2D, Reshape, Lambda, concatenate
-from keras.models import Model
-from keras.constraints import max_norm
-from basemodel.basemodel import BaseModel
 import tensorflow as tf
+from keras.backend import int_shape
+from keras.constraints import max_norm
+from keras.layers import Input, Conv2D, Conv2DTranspose, Activation, add, UpSampling2D, ConvLSTM2D, Reshape, concatenate
+from keras.models import Model
+
+from basemodel.basemodel import BaseModel
 
 
 class SRNDeblur(BaseModel):
@@ -113,10 +112,10 @@ class SRNDeblur(BaseModel):
         lstm = Reshape(target_shape=new_shape)(eblock2)
 
         # BUG: can't use initial_state -> https://github.com/keras-team/keras/issues/9761#issuecomment-567915470
-        lstm, h, c = ConvLSTM2D(features, kernel_size=kernel_size, padding="same",
-                                return_state=True, input_shape=new_shape, data_format='channels_last',
+        lstm = ConvLSTM2D(features, kernel_size=kernel_size, padding="same",
+                                return_state=False, input_shape=new_shape, data_format='channels_last',
                                 kernel_constraint=max_norm(3))(lstm)
-        lstm_state = [h, c]
+        lstm_state = None
 
         dblock2 = self.DBlock(lstm, kernel_size=kernel_size, strides=strides)
 
@@ -155,7 +154,7 @@ class SRNDeblur(BaseModel):
 
     def compile(self):
         from keras.optimizers import Adam
-        from src.basemodel.metrics import metrics
+        from basemodel.metrics import metrics
         # Keras will make a mean of the sum of the two euclidean distance
         if self._model is None: self._set_model()
         # lr_sched = tf.keras.optimizers.schedules.PolynomialDecay(1e-4, 2000, 1e-6, 0.3)  # as in the paper
@@ -166,7 +165,7 @@ class SRNDeblur(BaseModel):
         self._model.compile(**compile_args)
 
     def _data(self):
-        from src.basemodel.generator.reds_generator import reds_generators
+        from basemodel.generator.reds_generator import reds_generators
 
         train_gen = reds_generators("train",
                                     batch_size=self.batch_size, num_patches=self.num_patches, low_res=False,
@@ -226,13 +225,13 @@ class SRNDeblur(BaseModel):
         print(f"Image save at: {str(self.model_dir / 'test.png')}")
 
     def test_low_res(self):
-        from src.basemodel.generator.reds_generator import reds_generators
+        from basemodel.generator.reds_generator import reds_generators
         from random import randint
         import matplotlib.pyplot as plt
         import numpy as np
 
         test_gen = reds_generators("test", self.batch_size, low_res=True, patch_size=(256, 256))
-
+        # generate 5 images
         for k in range(5):
             batch_index = randint(0, test_gen.__len__())
 

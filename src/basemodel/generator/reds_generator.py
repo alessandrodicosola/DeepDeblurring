@@ -6,7 +6,7 @@ import tensorflow as tf
 from keras.preprocessing.image import load_img, img_to_array
 from keras.utils import Sequence
 
-from src.util import get_reds_dir
+from util import get_reds_dir
 
 
 def get_dirs(subset, quality, low_res=True) -> Path:
@@ -114,7 +114,7 @@ class reds_generators(Sequence):
         return sharp_list, blur_list
 
     def load_low_res_images(self, sharps, blurs):
-        out_sharps, out_blurs = list(),list()
+        out_sharps, out_blurs = list(), list()
         for s, b in zip(sharps, blurs):
             sharp = tf.image.resize_with_pad(img_to_array(load_img(s)) / 255., self.input2_size[1], self.input2_size[0])
             blur = tf.image.resize_with_pad(img_to_array(load_img(b)) / 255., self.input2_size[1], self.input2_size[0])

@@ -12,10 +12,11 @@ csvs = [
     [R"../models/ResUNet1/ResUNet1.log.csv", ["loss", "ssim_metric"], "ResUnet1"],
     [R"../models/ResUNet3/ResUNet3.log.csv", ["loss", "ssim_metric"], "ResUnet3"],
     [R"../models/CAESSC_d30_f64/CAESSC_d30_f64.log.csv", ["loss", "ssim_metric"], "CAESSC_d30_f64"],
-    [R"../models/CAESSC_d22_f128_half/CAESSC_d22_f128_half.log.csv", ["loss", "ssim_metric"], "CAESSC_d22_f128_half"]
+    [R"../models/CAESSC_d22_f128_half/CAESSC_d22_f128_half.log.csv", ["loss", "ssim_metric"], "CAESSC_d22_f128_half"],
+    [R"../models/CAESSC_d22_f128_half_no_sigmoid/CAESSC_d22_f128_half_no_sigmoid.log.csv", ["loss", "ssim_metric"], "CAESSC_d22_f128_half_no_sigmoid"]
 ]
 
-from src.basemodel.common import plot_csv
+from basemodel.common import plot_csv
 
 for csv in csvs:
     plot_csv(csv[0], csv[1], csv[2])
