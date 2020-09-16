@@ -15,8 +15,12 @@ available_arguments = {
     "CAESSC": [{"dest": "depth", "help": "Total amount of layers", "type": int, "choices": [22, 30]},
                {"dest": "filters", "help": "Amount of filters to use in each layer", "type": int,
                 "choices": [64, 128]},
-               {"dest": "--downsample", "help": "Allow downsampling on first layer", "action": "store_true"},
-               {"dest": "--use_relu", "help": "Use ReLU as last activation function", "action": "store_true"}],
+               ["--downsample",
+                {"help": "Allow downsampling on first layer",
+                 "action": "store_true"}],
+               ["--use_relu",
+                {"help": "Use ReLU as last activation function",
+                 "action": "store_true"}]],
     "SRNDeblur_cifar": [{"dest": "use_lstm", "action": "store_true"}],
     "SRNDeblur_reds": [{"dest": "low_res_test", "action": "store_true"}]
 }
@@ -28,12 +32,19 @@ args = argparse.ArgumentParser(prog="Deep deblurring")
 subargs = args.add_subparsers(title="Available models", help="MODEL -h for additional information", dest="model")
 for model in available_arguments:
     parser = subargs.add_parser(model,
-                                description="Available configuration: CAESSC [22 128 --downsample] [30 64] [22 128 --downsample --use_relu]" if model == "CAESSC" else None)
+                                description="Available configuration: << CAESSC 22 128 --downsample>> << CAESSC 30 64 >>, << CAESSC 22 128 --downsample --use_relu >>" if model == "CAESSC" else None)
     for arg in available_arguments[model]:
-        parser.add_argument(**arg)
+        if isinstance(arg,list):
+            # arg[0]: positional arguments
+            # arg[1]: named arguments
+            parser.add_argument(arg[0], **(arg[1]))
+        elif isinstance(arg,dict):
+            # only named arguments
+            parser.add_argument(**arg)
+        else:
+            raise RuntimeError("Invalid data structure")
 
 result = args.parse_args()
-print(result)
 
 model = None
 if result.model == "ResUNet":
