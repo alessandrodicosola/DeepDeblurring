@@ -1,3 +1,6 @@
 models/SRDeblur_cifar_lstm/SRDeblur_cifar_lstm_best.h5 filter=lfs diff=lfs merge=lfs -text
 models/SRDeblur_cifar_no_lstm/SRDeblur_cifar_no_lstm_best.h5 filter=lfs diff=lfs merge=lfs -text
+models/CAESSC_d22_f128_half/CAESSC_d22_f128_half_best.h5 filter=lfs diff=lfs merge=lfs -text
+models/CAESSC_d22_f128_half_no_sigmoid/CAESSC_d22_f128_half_no_sigmoid_best.h5 filter=lfs diff=lfs merge=lfs -text
+models/SRDeblur_reds_hr/SRDeblur_reds_hr_best.h5 filter=lfs diff=lfs merge=lfs -text
 *.h5 filter=lfs diff=lfs merge=lfs -text
