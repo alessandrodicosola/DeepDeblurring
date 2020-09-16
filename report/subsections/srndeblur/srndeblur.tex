@@ -17,7 +17,7 @@ A novelty introduced by \cite{SRN-DeblurNet} is the use of a \textbf{recurrent l
 
 This architecture exploit all the technique introduced in the literature up to now:
 \begin{enumerate}
-    \item Fully connected convolutional neural network which allows the network to handle any input (provided that the machine is able to handle the input in memory)
+    \item Fully connected convolutional neural network which allows to handle any input (provided that the machine is able to handle the input in memory)
     \item The creation of blocks which allow to scale easily the network
     \item The encoder-decoder architecture
     \item The use of residual blocks
@@ -124,10 +124,10 @@ In order to cope with low memory and high training time, a tradeoff between batc
 \end{enumerate}
 
 \subsection{Training}
-The network was trained with Adam\cite{adam} using a learning rate of $1e^{-4}$ and MSE as loss function for both the output.
+The network was trained with Adam\cite{adam} using a learning rate of $1e^{-4}$ and MSE as loss function for both the outputs.
 The network used is the one at the epoch 150 when the training was stopped.
-Were spent 10h/day for training resuming each time the training. 
-\textbf{SRNDeblur\_reds} was trained for \textbf{150 epochs in {\raisebox{0.5ex}{\texttildelow}} 180h}. SRN\-DeblurNet\cite{SRN-DeblurNet} was trained for 2000 epochs in 72h. 
+Were spent 10h/day for training resuming each time the training.
+\textbf{SRNDeblur\_reds was trained for 150 epochs in 180h}. \underline{SRN\-DeblurNet\cite{SRN-DeblurNet} was trained for 2000 epochs in 72h.}
 
 \begin{figure}[H]
     \centering

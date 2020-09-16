@@ -7,15 +7,15 @@ The model is the following:
 \end{figure}
 
 In order to achieve good result for low-level image processing as deblurring, super-resolution, deep network are necessary.
-Nevertheless the deeper the network the slower the training is thus skip connections are used between symmetric convolutional and deconvolutional layers.
+Nevertheless the deeper the network, the slower the training is, thus skip connections are used between symmetric convolutional and deconvolutional layers.
 
-Features are extracted by convolutional layers (encoder) and those information are used by deconvolutional layer (decoder) for reconstructing the image; moreover symmetric  skip connections are used for increasing performance and the ability to converge of the network.
+Features are extracted by convolutional layers (encoder) and those information are used by deconvolutional layer (decoder) for reconstructing the image; moreover symmetric  skip connections are used for increasing the performance and the ability to converge of the network.
 
 The architecture is quite simple:
 \begin{itemize}
     \item Convolutional and deconvolutional layer are defined as the following: $\textnormal{Conv/Deconv} \rightarrow \textnormal{BN} \rightarrow \textnormal{ReLU}$
     \item The last layer use sigmoid\footnote{See \ref{caessctraining:training} Training} instead of ReLU (as defined in the paper)
-    \item The downsampling/upsampling are done by a the first Conv2D and last Conv2DTranspose.
+    \item The first Conv2D downsample the input and the last Conv2DTranspose upsample it.
     The researchers observed that an earlier downsampling allow to decrease the training time with a small reduction of the performance.
     \item Encoder-Decoder architecture where convolutional and deconvolutional layers are connected symmetrically
     \item A skip connection between the input and the output allow to learn the output deblurred without the skip connection plus all the details learned by the encoder. \footnote{Refer to \cite[4.1 Analysis of the architecture]{CAESSC}} 
@@ -40,7 +40,7 @@ The model implemented are:
 \subsection{Training}\label{caessctraining:training}
 The network was trained using Adam\cite{adam} with $1e^{-4}$ as learning rate, MSE as loss function and with an early stopping equals to 7 in order to push more the training.
 
-Using the configuration above was observed that the performance were poor with ReLU as last activation function: we can see that the network has learned poorly the "black-scale".
+Using the configuration above was observed that the performance were poor with ReLU as last activation function: we can see that the network can't restore black area of the input image properly.
 
 \begin{figure}[H]
     \centering
@@ -73,7 +73,7 @@ The evaluation of the networks is the following:
 
 \begin{tabularx}{300pt}{ccccc}
     network & MSE & PSNR & SSIM  \\
-    RED30\footnote{RED30 is composed by 30 layers with skip connections every 2 layers, 128 filters, kernel size equal to 3 and no downsampling. Taken from \url{https://github.com/ved27/RED-net/blob/master/model/REDNet_ch3.prototxt} and \url{/model/debluring/gaussian.caffemodel}} & - & 34.49 \\
+    RED30\footnote{RED30 is composed by 30 layers with skip connections every 2 layers, 128 filters, kernel size equal to 3 and no downsampling. Taken from \url{https://github.com/ved27/RED-net/blob/master/model/REDNet_ch3.prototxt} and \url{/model/debluring/gaussian.caffemodel}} & - & 34.49 & - \\
     \CAESSC{22}{128}{\_half\_no\_sigmoid} & 0.00389 & 24.85 & 0.839 \\
     \CAESSC{22}{128}{\_half} & 0.0020 & 28.12 & 0.916 \\
     \CAESSC{30}{64} & 0.0018 & 28.95 & 0.919

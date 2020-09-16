@@ -10,17 +10,17 @@ The U-Net \cite{unet} architecture is largely used in image segmentation due to 
 
 Descending and ascending paths are connected togheter at each level in order to share the information and achive a more precise classification: this is done \textit{concatenating} the features of each output in the descending path to the upsampled input of the ascending path.  
 
-This pattern can be also used for image-to-image processing although some changes are necessary:
+This pattern follows the encoder-decoder architecture which can be used for image-to-image processing, although some changes are necessary:
 \begin{itemize}
-    \item With respect to the original paper the downsampling and upsampling is done respectively using \textit{Conv2D}(red) and \textit{Conv2DTranspose}(yellow) in order to "learn" the transformation instead of using MaxPooling and UpSampling leading to a loss of information.
-    \item Moreover the \textit{ResBlock} ( as defined in \cite{resnet} ) is used in order to increment the amount of information propagated at each level in both paths. \footnote{In the CAESSC network will be discussed the advantages of the residual connections}
+    \item With respect to the original paper the downsampling and upsampling is done respectively using \textit{Conv2D}(red) and \textit{Conv2DTranspose}(yellow) in order to "learn" the transformation instead of using MaxPooling and UpSampling, leading to a loss of information.
+    \item Moreover the \textit{ResBlock} ( as defined in \cite{resnet} ) is used in order to increment the amount of information propagated at each level in both paths. \footnote{In the CAESSC network will be discussed the advantages of residual connections}
 \end{itemize}
 
 Since this network was used with \textit{CIFAR10} only (allowing a large batch), the \textit{Conv2D} layer is composed by:
 \begin{enumerate}
-    \item Conv2D using a filter $(3,3)$
+    \item Conv2D using a filter $(3,3)$.
     \item BatchNormalization \cite{BN}. It's necessary since the batch size is huge thus it allow to maintain the distribution of the inputs on each layer for each batch the same, allowing a faster training using a higher learning rate and avoiding exploding/vanising gradients.
-    \item Activation
+    \item Activation.
 \end{enumerate}
 
 The \textit{ResBlock} is composed by two Conv2D layers and the output is the concatenation of the last output with the input.  

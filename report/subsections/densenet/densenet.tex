@@ -18,10 +18,10 @@ The model implemented has different characteristics:
     \item The growth rate is 16 and the number of layers for the encoder are [6, 6, 3] and for the decoder [3, 6].
     \item A bottleneck layer is used for reducing the number of channels at the end of the encoder (thus reducing the number of parameters): for instance without the bottleneck layer the amount of parameters would be $124*3*3*124+124=138384$, instead with the bottleneck layer is $124*3*3*16+16 = 17872$ (so with bottleneck layer using a large growth rate and more layers would reduce a lot the parameters therefore reducing also the training time)
     \item With respect to the original paper the downsampling and upsampling is done respectively using Conv2D and Conv2DTranspose in order to "learn" the transformation instead of using MaxPooling and UpSampling leading to a loss of information.
-    \item Last layer is a Conv2DTranspose layer which "learn" to decode the output.
+    \item The last layer is a Conv2DTranspose which "learn" to decode the output.
 \end{itemize}
 \subsection{Training}
-The network was trained with Adam\cite{adam} with default parameters using an early stopping equals to 5 for avoiding overfitting and MSE as loss function.
+The network was trained with Adam\cite{adam} with default parameters and MSE as loss function.
 The network converged within 22 epochs with early stopping equals to 5.
 \begin{figure}[H]
     \centering
