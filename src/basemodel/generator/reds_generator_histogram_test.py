@@ -45,7 +45,14 @@ selected_files_blur_half = [str(file.absolute()).replace("sharp", "blur") for fi
 max = len(selected_files_sharp)
 
 
-def get_ssim_files(selected_files_sharp, selected_files_blur, ssim_threshold=1.0):
+def get_ssim_file(selected_files_sharp, selected_files_blur, ssim_threshold=1.0):
+    """
+    Generate ssim between file sharp and file blur
+    :param selected_files_sharp: selected sharp file
+    :param selected_files_blur:  selected blur file
+    :param ssim_threshold: similarity index threshold
+    :return: list of ssim
+    """
     from PIL import Image
     from skimage.metrics import structural_similarity as compute_ssim
     import numpy as np
@@ -100,6 +107,15 @@ def get_ssim_files(selected_files_sharp, selected_files_blur, ssim_threshold=1.0
 
 
 def get_ssims(filename, ssim_threshold, zip_iterable, iterations=5, num_thread=6):
+    """
+    Return ssims from images in iterable
+    :param filename: File where to save csv ssim
+    :param ssim_threshold: similarity index threshold
+    :param zip_iterable: iterable (sharp images path,blur images path)
+    :param iterations: how many times the ssims should be computed for the iterable
+    :param num_thread: amount of thread to use
+    :return: dataframe with column ssim
+    """
     from functools import partial
     from pathlib import Path
     import pandas as pd
@@ -108,7 +124,7 @@ def get_ssims(filename, ssim_threshold, zip_iterable, iterations=5, num_thread=6
     if path.exists():
         return pd.read_csv(str(filename))
     else:
-        get_ssim_files_wth_threshold = partial(get_ssim_files, ssim_threshold=ssim_threshold)
+        get_ssim_files_wth_threshold = partial(get_ssim_file, ssim_threshold=ssim_threshold)
         outlist = list()
         files = list(zip_iterable)
         with Pool(num_thread) as pool:
@@ -134,7 +150,7 @@ def plot_histograms(list_df, titles, legends, iterations=5):
     fig, axes = plt.subplots(1, n_sub)
     for df_index in range(len(list_df)):
         index = df_index // 2
-        list_df[df_index].ssim.plot.hist(ax=axes[index],alpha=0.3)
+        list_df[df_index].ssim.plot.hist(ax=axes[index], alpha=0.3)
         axes[index].set_xlabel("ssim")
         axes[index].set_title(titles[index])
         axes[index].legend(legends)
@@ -143,7 +159,7 @@ def plot_histograms(list_df, titles, legends, iterations=5):
     plt.close()
 
 
-def plot_kde(list_df, titles, iterations=5):
+def plot_kde(list_df, titles, ssim_threshold, iterations=5):
     """
     :param list_df: list of dataframe with ssim column
     :param titles: list of strings
@@ -163,7 +179,7 @@ def plot_kde(list_df, titles, iterations=5):
         kd = gaussian_kde(df.ssim.values, 'scott')
         kd_list.append(kd)
 
-    p1, p2, p3 = 0.0, 0.9, 1.25
+    p1, p2, p3 = 0.0, ssim_threshold, 1.25
     num_points = 300
     x_lt09 = np.linspace(p1, p2, num_points)
     x_gt09 = np.linspace(p2, p3, num_points)
@@ -176,7 +192,8 @@ def plot_kde(list_df, titles, iterations=5):
     fig.suptitle(f"KDE of the training set after {iterations} iterations")
     for index in range(len(list_df)):
         axes[index].set_title(titles[index])
-        list_df[index].ssim.plot.kde('scott', ax=axes[index],color=color3)
+        list_df[index].ssim.plot.kde('scott', ax=axes[index], color=color3)
+        # fill area ssim <= threshold
         fb1 = axes[index].fill_between(x_lt09, kd_list[index].pdf(x_lt09), color=color1, alpha=0.2)
         color1_alpha = fb1.get_fc()[0]
         fb2 = axes[index].fill_between(x_gt09, kd_list[index].pdf(x_gt09), color=color2, alpha=0.4)
@@ -212,7 +229,7 @@ def get_histogram_patches_quality():
     plot_histograms(list_df, titles, legends)
 
     titles = ["FULL ssim=1.0", "FULL ssim=0.9", "HALF ssim=1.0", "HALF ssim=0.9"]
-    plot_kde(list_df, titles)
+    plot_kde(list_df, titles,0.9)
 
 
 """
