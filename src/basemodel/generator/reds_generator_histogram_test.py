@@ -220,7 +220,7 @@ def get_histogram_patches_quality():
     ssim_full = get_ssims("ssim.csv", 1.0, iterable_full, iterations=iterations, num_thread=num_thread)
     ssim_half = get_ssims("ssim_half.csv", 1.0, iterable_half, iterations=iterations, num_thread=num_thread)
     ssim_full_09 = get_ssims("ssim_0.9.csv", 0.9, iterable_full, iterations=iterations, num_thread=num_thread)
-    ssim_half_09 = get_ssims("ssim_0.9.csv", 0.9, iterable_half, iterations=iterations, num_thread=num_thread)
+    ssim_half_09 = get_ssims("ssim_half_0.9.csv", 0.9, iterable_half, iterations=iterations, num_thread=num_thread)
 
     list_df = [ssim_full, ssim_full_09, ssim_half, ssim_half_09]
     titles = ["Full training set",
