@@ -259,6 +259,11 @@ class SRNDeblur(BaseModel):
             plt.savefig(self.model_dir / f"test.low_res.{k}.pdf", bbox_inches="tight")
             print(f"Image save at: {str(self.model_dir / f'test.low_res.{k}.pdf')}")
 
+    def open_test(self):
+        import subprocess
+        img = str(self.model_dir / "test.pdf" if not self.low_res else "test.low_res.0.pdf")
+        subprocess.run(["explorer", img])
+
     def evaluate(self):
         self.evaluate_images()
 
