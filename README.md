@@ -42,3 +42,5 @@ The models implemented are:
 - [SRNDeblur_cifar](/src/models/cifar10/SRNDeblur.py)
 - [SRNDeblur_reds](/src/models/reds/SRNDeblur.py)
 
+
+The model and weights are save in **/models/[MODEL NAME]/[MODEL NAME]_best.h5**
