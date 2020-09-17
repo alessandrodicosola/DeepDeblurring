@@ -19,14 +19,14 @@ pip install -r requirements_pip.txt
 - Go to the project folder (where src, report andmodels folders are)
 - activate environment
 - ```python
-  python main_cli.py MODEL PARAMS
+  python src/main_cli.py MODEL PARAMS
   ```
 
 # Documentation
 
 ```python
-python main_cli.py -h
-python main_cli.py MODEL -h 
+python src/main_cli.py -h
+python src/main_cli.py MODEL -h 
 ```
 
 # Report
