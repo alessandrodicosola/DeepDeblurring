@@ -261,7 +261,9 @@ class SRNDeblur(BaseModel):
 
     def open_test(self):
         import subprocess
-        name = "test.pdf" if not self.low_res else "test.low_res.0.pdf"
+        import random
+        k = random.randint(1,5)
+        name = "test.pdf" if not self.low_res else f"test.low_res.{k}.pdf"
         img = str(self.model_dir / name)
         subprocess.run(["explorer", img])
 
