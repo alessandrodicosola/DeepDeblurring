@@ -36,9 +36,9 @@ The powerpoint presentation is report/***powerpoint.pdf***
 
 # Models
 The models implemented are:
-- [ResUNet](../src/models/cifar10/ResUNet.py)
-- [EDDenseNet](../src/models/cifar10/EDDenseNet.py)
-- [CAESSC](../src/models/cifar10/CAESSC.py)
-- [SRNDeblur_cifar](../src/models/cifar10/SRNDeblur.py)
-- [SRNDeblur_reds](../src/models/reds/SRNDeblur.py)
+- [ResUNet](/src/models/cifar10/ResUNet.py)
+- [EDDenseNet](/src/models/cifar10/EDDenseNet.py)
+- [CAESSC](/src/models/cifar10/CAESSC.py)
+- [SRNDeblur_cifar](/src/models/cifar10/SRNDeblur.py)
+- [SRNDeblur_reds](/src/models/reds/SRNDeblur.py)
 
