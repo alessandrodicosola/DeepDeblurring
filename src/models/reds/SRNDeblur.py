@@ -221,8 +221,8 @@ class SRNDeblur(BaseModel):
             axes[i, 2].imshow(sharp)
             axes[i, 2].set_title("True image")
 
-        plt.savefig(self.model_dir / "test.png", bbox_inches="tight")
-        print(f"Image save at: {str(self.model_dir / 'test.png')}")
+        plt.savefig(self.model_dir / "test.pdf", bbox_inches="tight")
+        print(f"Image save at: {str(self.model_dir / 'test.pdf')}")
 
     def test_low_res(self):
         from basemodel.generator.reds_generator import reds_generators
@@ -256,8 +256,8 @@ class SRNDeblur(BaseModel):
                 axes[i, 2].imshow(sharp)
                 axes[i, 2].set_title("True image")
 
-            plt.savefig(self.model_dir / f"test.low_res.{k}.png", bbox_inches="tight")
-            print(f"Image save at: {str(self.model_dir / f'test.low_res.{k}.png')}")
+            plt.savefig(self.model_dir / f"test.low_res.{k}.pdf", bbox_inches="tight")
+            print(f"Image save at: {str(self.model_dir / f'test.low_res.{k}.pdf')}")
 
     def evaluate(self):
         self.evaluate_images()
