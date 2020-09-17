@@ -261,7 +261,8 @@ class SRNDeblur(BaseModel):
 
     def open_test(self):
         import subprocess
-        img = str(self.model_dir / "test.pdf" if not self.low_res else "test.low_res.0.pdf")
+        name = "test.pdf" if not self.low_res else "test.low_res.0.pdf"
+        img = str(self.model_dir / name)
         subprocess.run(["explorer", img])
 
     def evaluate(self):
