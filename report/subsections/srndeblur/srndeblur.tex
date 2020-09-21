@@ -87,7 +87,7 @@ The hyperparamters are the following:
 In order to cope with low memory and high training time, a tradeoff between batch size and training set size was necessary. 
 
 \begin{enumerate}
-    \item The first 24 scenes on the training set were used as validation set
+    \item The first 24 scenes on the training set were used as test set
     \item It's used half of the training set \footnote{It's used the following expression self.dir\_sharp.glob(**/000000[5-9][0-9].png)}
     \item Two patches are taken from each image: the idea is that the more are the patches taken the greater is the probability that patches contain a motion blur. For instance with $\textnormal{batch\_size}=10$ and $\textnormal{num\_patches}=2$ at each batch $10//2=5$ images are selected.
     \item An analysis of the training set show that the probability that a patch is too perfect [Figure \ref{high_ssim_patch1} and \ref{high_ssim_patch2}] is 29\% (using kernel density estimation\footnote{Refer to reds\_generator\_histogram\_test.py} - Figure \ref{kde_train}) therefore the \textbf{ssim} of patches extracted is computed in order to take the ones with a ssim less than $\textnormal{ssim\_threshold} = 0.9$ for avoiding patches that could influence negatively the training and so use as efficiently as possible each epoch.
